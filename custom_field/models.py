@@ -37,6 +37,10 @@ class CustomField(models.Model):
         blank=True,
         help_text="You may leave blank. For Boolean use True or False")
     is_required = models.BooleanField(default=False)
+    mask = models.CharField(
+        max_length=5000,
+        blank=True,
+        help_text="You may leave blank. For user Jquery Mask, ex: '00/00/0000' for date.")
     field_choices = models.CharField(
         max_length=2000,
         blank=True,
@@ -58,8 +62,7 @@ class CustomField(models.Model):
             'required': self.is_required,
         }
         if self.field_type == "b":
-            check_choices = (('True', 'True'), ('False', 'False'))
-            return forms.ChoiceField(choices=check_choices, **universal_kwargs)
+            return forms.BooleanField(**universal_kwargs)
         elif self.field_type == "i":
             return forms.IntegerField(**universal_kwargs)
         elif self.field_type == "f":
