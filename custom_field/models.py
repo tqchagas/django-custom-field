@@ -5,6 +5,8 @@ from django.contrib.contenttypes import fields
 from django.utils.encoding import python_2_unicode_compatible
 import sys
 
+from rest_framework import serializers
+
 
 if sys.version < '3':
     text_type = unicode
@@ -56,11 +58,12 @@ class CustomField(models.Model):
     def __str__(self):
         return self.name
 
-    def get_form_field(self):
-        universal_kwargs = {
-            'initial': self.default_value,
-            'required': self.is_required,
-        }
+def get_form_field(self, django_rest_serializer=False):
+    universal_kwargs = {
+        'initial': self.default_value,
+        'required': self.is_required,
+    }
+    if not django_rest_serializer:
         if self.field_type == "b":
             return forms.BooleanField(**universal_kwargs)
         elif self.field_type == "i":
@@ -81,6 +84,28 @@ class CustomField(models.Model):
                 choices=select_choices, **universal_kwargs)
         elif self.field_type == "d":
             return forms.DateField(**universal_kwargs)
+        return forms.CharField(**universal_kwargs)
+    else:
+        if self.field_type == "b":
+            return serializers.BooleanField(**universal_kwargs)
+        elif self.field_type == "i":
+            return serializers.IntegerField(**universal_kwargs)
+        elif self.field_type == "f":
+            return serializers.FloatField(**universal_kwargs)
+        elif self.field_type == "a":
+            return serializers.CharField(widget=forms.Textarea, **universal_kwargs)
+        elif self.field_type == "m":
+            choices = self.field_choices.split(',')
+            if self.is_required is True:
+                select_choices = ()
+            else:
+                select_choices = (('', '---------'),)
+            for choice in choices:
+                select_choices = select_choices + ((choice, choice),)
+            return serializers.ChoiceField(
+                choices=select_choices, **universal_kwargs)
+        elif self.field_type == "d":
+            return serializers.DateField(**universal_kwargs)
         return forms.CharField(**universal_kwargs)
 
     class Meta:
