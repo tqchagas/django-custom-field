@@ -64,7 +64,7 @@ class CustomFieldValueForm(forms.ModelForm):
         super(CustomFieldValueForm, self).__init__(*args, **kwargs)
         if self.instance:
             try:
-                self.fields['value'] = self.instance.get_form_field()
+                self.fields['value'] = self.instance.get_form_field(django_rest_serializer=False)
             except ObjectDoesNotExist:
                 pass
 

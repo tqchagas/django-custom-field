@@ -134,12 +134,12 @@ class CustomFieldValue(models.Model):
             self.save()
 
     def clean(self):
-        form_field = self.get_form_field()
+        form_field = self.get_form_field(django_rest_serializer=False)
         form_field.clean(self.value)
         return super(CustomFieldValue, self).clean()
 
-    def get_form_field(self):
-        return self.field.get_form_field()
+    def get_form_field(self, django_rest_serializer=False):
+        return self.field.get_form_field(django_rest_serializer=False)
 
     class Meta:
         unique_together = ('field', 'object_id')
